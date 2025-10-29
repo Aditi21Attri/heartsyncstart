@@ -1,32 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="#F5F5F5">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/heartsync_logo"
-        android:contentDescription="HeartSync Logo" />
-
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- App Bar -->
+    <RelativeLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Browse Users"
-        android:textColor="#333333"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:contentDescription="HeartSync Logo"
+            android:src="@drawable/heartsync_logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="48dp"
+            android:text="HeartSync"
+            android:textColor="#FF6B81"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <!-- User Card Container -->
+    <FrameLayout
+        android:id="@+id/cardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/actionButtons"
+        android:layout_below="@id/appBar">
+
+        <!-- User Card will be displayed here -->
+        <include
+            android:id="@+id/userCard"
+            layout="@layout/item_user_card" />
+
+        <!-- No More Users Message -->
+        <LinearLayout
+            android:id="@+id/noUsersLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="😊"
+                android:textSize="64sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No more users nearby"
+                android:textColor="#666666"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Check back later for new people"
+                android:textColor="#999999"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:id="@+id/actionButtons"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Swipe feature coming soon!"
-        android:textColor="#666666"
-        android:textSize="16sp" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-</LinearLayout>
+        <!-- Pass Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnPass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:contentDescription="Pass"
+            app:backgroundTint="#EEEEEE"
+            app:fabSize="normal"
+            app:srcCompat="@android:drawable/ic_delete"
+            app:tint="#FF6B81" />
+
+        <!-- Like Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Like"
+            app:backgroundTint="#FF6B81"
+            app:fabSize="normal"
+            app:srcCompat="@android:drawable/btn_star_big_on"
+            app:tint="@android:color/white" />
+
+    </LinearLayout>
+
+</RelativeLayout>
