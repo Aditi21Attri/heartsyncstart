@@ -22,7 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
@@ -32,10 +34,12 @@ public class HomeFragment extends Fragment {
     private LinearLayout noUsersLayout;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef;
+    private DatabaseReference usersRef, currentUserRef;
     private String currentUserId;
 
     private List<User> userList = new ArrayList<>();
+    private Map<String, Boolean> likedUserIds = new HashMap<>();
+    private Map<String, Boolean> passedUserIds = new HashMap<>();
     private int currentUserIndex = 0;
 
     @Nullable
@@ -54,6 +58,7 @@ public class HomeFragment extends Fragment {
 
             currentUserId = mAuth.getCurrentUser().getUid();
             usersRef = FirebaseDatabase.getInstance().getReference("Users");
+            currentUserRef = usersRef.child(currentUserId);
 
             // Initialize Views
             userCard = view.findViewById(R.id.userCard);
@@ -64,8 +69,8 @@ public class HomeFragment extends Fragment {
             btnPass = view.findViewById(R.id.btnPass);
             noUsersLayout = view.findViewById(R.id.noUsersLayout);
 
-            // Load users
-            loadUsers();
+            // Load current user's liked/passed list first, then load users
+            loadCurrentUserData();
 
             // Button Click Listeners
             btnLike.setOnClickListener(v -> likeUser());
@@ -79,6 +84,35 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    private void loadCurrentUserData() {
+        currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Load liked users
+                if (snapshot.child("likedUsers").exists()) {
+                    for (DataSnapshot likedSnapshot : snapshot.child("likedUsers").getChildren()) {
+                        likedUserIds.put(likedSnapshot.getKey(), true);
+                    }
+                }
+
+                // Load passed users (we'll track this now)
+                if (snapshot.child("passedUsers").exists()) {
+                    for (DataSnapshot passedSnapshot : snapshot.child("passedUsers").getChildren()) {
+                        passedUserIds.put(passedSnapshot.getKey(), true);
+                    }
+                }
+
+                // Now load all users
+                loadUsers();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void loadUsers() {
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -89,9 +123,14 @@ public class HomeFragment extends Fragment {
                     try {
                         User user = userSnapshot.getValue(User.class);
 
-                        // Don't show current user
+                        // Filter logic:
+                        // 1. Don't show current user
+                        // 2. Don't show already liked users
+                        // 3. Don't show already passed users
                         if (user != null && user.getUserId() != null &&
-                                !user.getUserId().equals(currentUserId)) {
+                                !user.getUserId().equals(currentUserId) &&
+                                !likedUserIds.containsKey(user.getUserId()) &&
+                                !passedUserIds.containsKey(user.getUserId())) {
                             userList.add(user);
                         }
                     } catch (Exception e) {
@@ -133,23 +172,76 @@ public class HomeFragment extends Fragment {
         if (currentUserIndex < userList.size()) {
             User likedUser = userList.get(currentUserIndex);
 
-            Toast.makeText(getContext(), "Liked " + likedUser.getName() + " ❤️", Toast.LENGTH_SHORT).show();
+            // ✅ SAVE LIKE TO FIREBASE
+            currentUserRef.child("likedUsers").child(likedUser.getUserId()).setValue(true)
+                    .addOnSuccessListener(aVoid -> {
+                        // Add to local list so it won't appear again
+                        likedUserIds.put(likedUser.getUserId(), true);
 
-            // Move to next user
-            currentUserIndex++;
-            displayCurrentUser();
+                        // Check for match
+                        checkForMatch(likedUser);
+
+                        Toast.makeText(getContext(), "Liked " + likedUser.getName() + " ❤️", Toast.LENGTH_SHORT).show();
+
+                        // Move to next user
+                        currentUserIndex++;
+                        displayCurrentUser();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to save like", Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 
     private void passUser() {
         if (currentUserIndex < userList.size()) {
             User passedUser = userList.get(currentUserIndex);
-            Toast.makeText(getContext(), "Passed " + passedUser.getName(), Toast.LENGTH_SHORT).show();
 
-            // Move to next user
-            currentUserIndex++;
-            displayCurrentUser();
+            // ✅ SAVE PASS TO FIREBASE (so they don't appear again)
+            currentUserRef.child("passedUsers").child(passedUser.getUserId()).setValue(true)
+                    .addOnSuccessListener(aVoid -> {
+                        // Add to local list
+                        passedUserIds.put(passedUser.getUserId(), true);
+
+                        Toast.makeText(getContext(), "Passed " + passedUser.getName(), Toast.LENGTH_SHORT).show();
+
+                        // Move to next user
+                        currentUserIndex++;
+                        displayCurrentUser();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to save pass", Toast.LENGTH_SHORT).show();
+                    });
         }
+    }
+
+    private void checkForMatch(User likedUser) {
+        // Check if the other user has also liked you
+        usersRef.child(likedUser.getUserId()).child("likedUsers").child(currentUserId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // ✅ IT'S A MATCH!
+                            createMatch(likedUser);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+    }
+
+    private void createMatch(User matchedUser) {
+        // Add to both users' matches in Firebase
+        currentUserRef.child("matches").child(matchedUser.getUserId()).setValue(true);
+        usersRef.child(matchedUser.getUserId()).child("matches").child(currentUserId).setValue(true);
+
+        // Show match notification
+        Toast.makeText(getContext(),
+                "🎉 IT'S A MATCH with " + matchedUser.getName() + "! 💕\nCheck your Matches tab!",
+                Toast.LENGTH_LONG).show();
     }
 
     private void showNoUsersMessage() {
