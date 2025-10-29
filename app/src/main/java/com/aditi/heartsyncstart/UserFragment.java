@@ -43,7 +43,7 @@ public class UserFragment extends Fragment {
         // Initialize users
         users = new ArrayList<>();
         users.add(new User("Aditi", 23, "Loves coding, coffee, and travel 🌍", R.drawable.sample_user));
-        users.add(new User("Rohan", 25, "Music lover 🎵 and foodie 🍕", R.drawable.sample_user2));
+        users.add(new User("Rohan", 25, "Music lover 🎵 and foodie 🍕", R.drawable.sample_user));
 
         showUser(currentIndex);
 
