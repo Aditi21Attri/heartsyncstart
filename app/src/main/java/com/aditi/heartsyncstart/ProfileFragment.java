@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,7 +62,8 @@ public class ProfileFragment extends Fragment {
 
         // Edit profile button click (for later)
         btnEditProfile.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Edit Profile feature coming soon!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+            startActivity(intent);
         });
 
         return view;
