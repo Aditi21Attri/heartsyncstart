@@ -14,10 +14,7 @@ HeartSync is a modern dating app designed to connect individuals looking for mea
 - Block and report users  
 - User privacy settings  
 
-## Screenshots  
-![Screenshot 1](https://example.com/path/to/screenshot1.png)  
-![Screenshot 2](https://example.com/path/to/screenshot2.png)  
-![Screenshot 3](https://example.com/path/to/screenshot3.png)  
+
 
 ## Tech Stack  
 - **Firebase**  
@@ -108,7 +105,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white)  
 ![Java](https://img.shields.io/badge/Java-007396?style=flat&logo=java&logoColor=white)  
 ![Glide](https://img.shields.io/badge/Glide-3DDC84?style=flat&logo=glide&logoColor=white)  
-
----  
-
-For more information, visit our [website](https://example.com) or contact us at [support@example.com].
