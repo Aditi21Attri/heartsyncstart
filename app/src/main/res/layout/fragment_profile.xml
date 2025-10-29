@@ -135,6 +135,35 @@
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+        <!-- Settings Button -->
+        <Button
+            android:id="@+id/btnSettings"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:paddingVertical="16dp"
+            android:text="⚙️ Settings"
+            android:textColor="#FF6B81"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp"
+            app:strokeColor="#FF6B81"
+            app:strokeWidth="2dp" />
+
+        <!-- Edit Profile Button -->
+        <Button
+            android:id="@+id/btnEditProfile"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:paddingVertical="16dp"
+            android:text="Edit Profile"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FF6B81"
+            app:cornerRadius="28dp" />
 
         <!-- Edit Profile Button -->
         <Button

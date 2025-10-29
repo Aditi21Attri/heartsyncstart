@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -34,7 +35,7 @@ public class ProfileFragment extends Fragment {
 
     private ImageView ivProfilePicture;
     private TextView tvName, tvEmail, tvAge, tvBio, tvGender;
-    private Button btnLogout, btnEditProfile, btnUploadPhoto;
+    private Button btnLogout, btnEditProfile, btnUploadPhoto, btnSettings;
 
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
@@ -68,6 +69,7 @@ public class ProfileFragment extends Fragment {
         btnLogout = view.findViewById(R.id.btnLogout);
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
         btnUploadPhoto = view.findViewById(R.id.btnUploadPhoto);
+        btnSettings = view.findViewById(R.id.btnSettings);
 
         // Setup image picker
         imagePickerLauncher = registerForActivityResult(
@@ -87,6 +89,12 @@ public class ProfileFragment extends Fragment {
 
         // Logout button click
         btnLogout.setOnClickListener(v -> logoutUser());
+
+        // Settings button
+        btnSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        });
 
         // Edit profile button click
         btnEditProfile.setOnClickListener(v -> {

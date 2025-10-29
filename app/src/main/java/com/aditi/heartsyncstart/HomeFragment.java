@@ -118,40 +118,103 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadUsers() {
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        // First, load user's filter settings
+        currentUserRef.child("settings").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userList.clear();
+            public void onDataChange(@NonNull DataSnapshot settingsSnapshot) {
+                // Get filter settings
+                int minAge = 18;
+                int maxAge = 60;
+                String genderPref = "Everyone";
+                boolean isInvisible = false;
 
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    try {
-                        User user = userSnapshot.getValue(User.class);
+                if (settingsSnapshot.exists()) {
+                    minAge = settingsSnapshot.child("minAge").getValue(Integer.class) != null ?
+                            settingsSnapshot.child("minAge").getValue(Integer.class) : 18;
+                    maxAge = settingsSnapshot.child("maxAge").getValue(Integer.class) != null ?
+                            settingsSnapshot.child("maxAge").getValue(Integer.class) : 60;
+                    genderPref = settingsSnapshot.child("genderPreference").getValue(String.class) != null ?
+                            settingsSnapshot.child("genderPreference").getValue(String.class) : "Everyone";
+                    isInvisible = settingsSnapshot.child("invisibleMode").getValue(Boolean.class) != null ?
+                            settingsSnapshot.child("invisibleMode").getValue(Boolean.class) : false;
+                }
 
-                        // Filter logic:
-                        // 1. Don't show current user
-                        // 2. Don't show already liked users
-                        // 3. Don't show already passed users
-                        if (user != null && user.getUserId() != null &&
-                                !user.getUserId().equals(currentUserId) &&
-                                !likedUserIds.containsKey(user.getUserId()) &&
-                                !passedUserIds.containsKey(user.getUserId())) {
-                            userList.add(user);
+                final int finalMinAge = minAge;
+                final int finalMaxAge = maxAge;
+                final String finalGenderPref = genderPref;
+                final boolean finalIsInvisible = isInvisible;
+
+                // Now load users with filters applied
+                usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userList.clear();
+
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            try {
+                                User user = userSnapshot.getValue(User.class);
+
+                                if (user == null || user.getUserId() == null) continue;
+
+                                // Filter 1: Don't show current user
+                                if (user.getUserId().equals(currentUserId)) continue;
+
+                                // Filter 2: Don't show already liked users
+                                if (likedUserIds.containsKey(user.getUserId())) continue;
+
+                                // Filter 3: Don't show already passed users
+                                if (passedUserIds.containsKey(user.getUserId())) continue;
+
+                                // Filter 4: Check if other user is invisible
+                                DataSnapshot otherUserSettings = userSnapshot.child("settings");
+                                boolean otherUserInvisible = false;
+                                if (otherUserSettings.exists() &&
+                                        otherUserSettings.child("invisibleMode").getValue(Boolean.class) != null) {
+                                    otherUserInvisible = otherUserSettings.child("invisibleMode").getValue(Boolean.class);
+                                }
+                                if (otherUserInvisible) continue;
+
+                                // Filter 5: Age filter
+                                int userAge = 0;
+                                try {
+                                    userAge = Integer.parseInt(user.getAge());
+                                } catch (NumberFormatException e) {
+                                    continue; // Skip if age is invalid
+                                }
+                                if (userAge < finalMinAge || userAge > finalMaxAge) continue;
+
+                                // Filter 6: Gender preference
+                                if (!finalGenderPref.equals("Everyone")) {
+                                    if (user.getGender() == null || !user.getGender().equals(finalGenderPref)) {
+                                        continue;
+                                    }
+                                }
+
+                                // All filters passed - add user to list
+                                userList.add(user);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
 
-                if (userList.isEmpty()) {
-                    showNoUsersMessage();
-                } else {
-                    displayCurrentUser();
-                }
+                        if (userList.isEmpty()) {
+                            showNoUsersMessage();
+                        } else {
+                            displayCurrentUser();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(), "Failed to load users", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load users", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load settings", Toast.LENGTH_SHORT).show();
             }
         });
     }
