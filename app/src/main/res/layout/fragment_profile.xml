@@ -27,12 +27,24 @@
                 android:padding="24dp">
 
                 <!-- Profile Picture Placeholder -->
+                <!-- Profile Picture Placeholder -->
                 <ImageView
                     android:id="@+id/ivProfilePicture"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:background="@drawable/heartsync_logo"
+                    android:src="@drawable/heartsync_logo"
                     android:contentDescription="Profile Picture" />
+
+                <!-- Upload Photo Button -->
+                <Button
+                    android:id="@+id/btnUploadPhoto"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Change Photo"
+                    android:textColor="#FF6B81"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvName"

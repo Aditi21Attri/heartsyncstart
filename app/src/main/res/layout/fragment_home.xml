@@ -35,6 +35,7 @@
         android:padding="16dp">
 
         <!-- User Card -->
+        <!-- User Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/userCard"
             android:layout_width="match_parent"
@@ -45,15 +46,29 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#FF6B81">
+                android:layout_height="match_parent">
+
+                <!-- User Image -->
+                <ImageView
+                    android:id="@+id/ivUserImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/heartsync_logo"
+                    android:contentDescription="User Image" />
+
+                <!-- Dark overlay at bottom -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/gradient_overlay" />
 
                 <!-- User Info Container -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
-                    android:background="#80000000"
                     android:orientation="vertical"
                     android:padding="24dp">
 
@@ -98,7 +113,6 @@
             </RelativeLayout>
 
         </androidx.cardview.widget.CardView>
-
         <!-- No More Users Message -->
         <LinearLayout
             android:id="@+id/noUsersLayout"

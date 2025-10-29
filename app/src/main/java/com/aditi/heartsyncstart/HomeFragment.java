@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +34,7 @@ public class HomeFragment extends Fragment {
     private TextView tvUserName, tvUserAge, tvUserBio;
     private FloatingActionButton btnLike, btnPass;
     private LinearLayout noUsersLayout;
+    private ImageView ivUserImage;
 
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef, currentUserRef;
@@ -68,6 +71,7 @@ public class HomeFragment extends Fragment {
             btnLike = view.findViewById(R.id.btnLike);
             btnPass = view.findViewById(R.id.btnPass);
             noUsersLayout = view.findViewById(R.id.noUsersLayout);
+            ivUserImage = view.findViewById(R.id.ivUserImage);
 
             // Load current user's liked/passed list first, then load users
             loadCurrentUserData();
@@ -95,7 +99,7 @@ public class HomeFragment extends Fragment {
                     }
                 }
 
-                // Load passed users (we'll track this now)
+                // Load passed users
                 if (snapshot.child("passedUsers").exists()) {
                     for (DataSnapshot passedSnapshot : snapshot.child("passedUsers").getChildren()) {
                         passedUserIds.put(passedSnapshot.getKey(), true);
@@ -160,6 +164,17 @@ public class HomeFragment extends Fragment {
             tvUserAge.setText(user.getAge() != null ? user.getAge() : "N/A");
             tvUserBio.setText(user.getBio() != null && !user.getBio().isEmpty() ?
                     user.getBio() : "No bio available");
+
+            // Load user image
+            if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
+                Glide.with(this)
+                        .load(user.getImageUrl())
+                        .centerCrop()
+                        .placeholder(R.drawable.heartsync_logo)
+                        .into(ivUserImage);
+            } else {
+                ivUserImage.setImageResource(R.drawable.heartsync_logo);
+            }
 
             userCard.setVisibility(View.VISIBLE);
             noUsersLayout.setVisibility(View.GONE);

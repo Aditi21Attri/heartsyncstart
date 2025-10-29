@@ -3,11 +3,14 @@ package com.aditi.heartsyncstart;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +47,17 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
         holder.tvName.setText(user.getName());
         holder.tvLastMessage.setText(conversation.getLastMessage());
 
+        // Load profile image
+        if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(user.getImageUrl())
+                    .circleCrop()
+                    .placeholder(R.drawable.heartsync_logo)
+                    .into(holder.ivProfilePic);
+        } else {
+            holder.ivProfilePic.setImageResource(R.drawable.heartsync_logo);
+        }
+
         // Format timestamp
         if (conversation.getTimestamp() > 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault());
@@ -63,11 +77,13 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
 
     static class ConversationViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
+        ImageView ivProfilePic;
         TextView tvName, tvLastMessage, tvTime;
 
         public ConversationViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.conversationCard);
+            ivProfilePic = itemView.findViewById(R.id.ivConversationProfilePic);
             tvName = itemView.findViewById(R.id.tvConversationName);
             tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
             tvTime = itemView.findViewById(R.id.tvConversationTime);

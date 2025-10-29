@@ -15,13 +15,13 @@
         android:padding="16dp">
 
         <!-- Profile Picture -->
-        <TextView
+        <ImageView
+            android:id="@+id/ivConversationProfilePic"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="#FF6B81"
-            android:gravity="center"
-            android:text="👤"
-            android:textSize="32sp" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/heartsync_logo"
+            android:contentDescription="Profile Picture" />
 
         <!-- Message Info -->
         <LinearLayout

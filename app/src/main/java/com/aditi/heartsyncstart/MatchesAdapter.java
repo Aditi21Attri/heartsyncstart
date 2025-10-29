@@ -3,11 +3,14 @@ package com.aditi.heartsyncstart;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -41,6 +44,17 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
         holder.tvBio.setText(user.getBio() != null && !user.getBio().isEmpty() ?
                 user.getBio() : "No bio");
 
+        // Load profile image
+        if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(user.getImageUrl())
+                    .circleCrop()
+                    .placeholder(R.drawable.heartsync_logo)
+                    .into(holder.ivProfilePic);
+        } else {
+            holder.ivProfilePic.setImageResource(R.drawable.heartsync_logo);
+        }
+
         holder.cardView.setOnClickListener(v -> listener.onMatchClick(user));
     }
 
@@ -51,11 +65,13 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
 
     static class MatchViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
+        ImageView ivProfilePic;
         TextView tvName, tvAge, tvBio;
 
         public MatchViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.matchCard);
+            ivProfilePic = itemView.findViewById(R.id.ivMatchProfilePic);
             tvName = itemView.findViewById(R.id.tvMatchName);
             tvAge = itemView.findViewById(R.id.tvMatchAge);
             tvBio = itemView.findViewById(R.id.tvMatchBio);
