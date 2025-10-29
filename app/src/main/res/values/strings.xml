@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">heartsyncstart</string>
+    <string name="sign_up_prompt">Don’t have an account? Sign Up</string>
+    <string name="app_logo">App Logo</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_login">Login</string>
+    <string name="social_login_prompt">Or continue with</string>
+    <string name="btn_google_login">Login with Google</string>
+    <string name="btn_facebook_login">Login with Facebook</string>
+    <string name="btn_apple_login">Login with Apple</string>
+</resources>

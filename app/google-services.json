@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "214830588963",
+    "project_id": "heartsync-d8bd8",
+    "storage_bucket": "heartsync-d8bd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214830588963:android:3d2808d9df0bc4501d7d96",
+        "android_client_info": {
+          "package_name": "com.aditi.heartsyncstart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEhG4WYs_Ka9W8qXHG2FyxD6FAecKE_rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214830588963:android:aea083662102ed071d7d96",
+        "android_client_info": {
+          "package_name": "com.aditi.newheartsync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEhG4WYs_Ka9W8qXHG2FyxD6FAecKE_rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

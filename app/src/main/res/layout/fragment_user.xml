@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_fragment_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F5F7"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Profile Card -->
+        <LinearLayout
+            android:id="@+id/user_card"
+            android:layout_width="320dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/card_background"
+            android:elevation="6dp"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/user_image"
+                android:layout_width="276dp"
+                android:layout_height="537dp"
+                android:layout_weight="2"
+                android:scaleType="centerCrop"
+                android:src="@drawable/sample_user" />
+
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Aditi, 23"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#222222" />
+
+            <TextView
+                android:id="@+id/user_bio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:text="Loves coding, coffee, and travel 🌍"
+                android:textSize="16sp"
+                android:textColor="#555555" />
+        </LinearLayout>
+
+        <!-- Navigation Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:weightSum="2"
+            android:paddingHorizontal="16dp">
+
+            <Button
+                android:id="@+id/btn_prev"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Previous" />
+
+            <Button
+                android:id="@+id/btn_next"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Next" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
