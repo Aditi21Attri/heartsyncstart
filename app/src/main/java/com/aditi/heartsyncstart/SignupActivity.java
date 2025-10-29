@@ -13,6 +13,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -21,12 +23,18 @@ public class SignupActivity extends AppCompatActivity {
     private EditText etName, etEmail, etPassword, etAge, etBio;
     private RadioGroup rgGender;
     private Button btnSignUp;
+
+    // Firebase
+    private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
         // Initialize Firebase Database
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -103,30 +111,43 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        // Generate unique user ID
-        String userId = databaseReference.push().getKey();
+        // ✅ STEP 1: Create Firebase Authentication Account
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // ✅ STEP 2: Get the created user's ID from Firebase Auth
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
 
-        // Create User object
-        User user = new User(userId, name, email, age, bio, gender);
+                            // ✅ STEP 3: Create User object (WITHOUT password for security)
+                            User user = new User(userId, name, email, age, bio, gender);
 
-        // Save to Firebase Realtime Database
-        if (userId != null) {
-            databaseReference.child(userId).setValue(user)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(SignupActivity.this,
-                                    "Registration Successful!", Toast.LENGTH_SHORT).show();
+                            // ✅ STEP 4: Save user data to Firebase Realtime Database
+                            databaseReference.child(userId).setValue(user)
+                                    .addOnCompleteListener(dbTask -> {
+                                        if (dbTask.isSuccessful()) {
+                                            Toast.makeText(SignupActivity.this,
+                                                    "Registration Successful!", Toast.LENGTH_SHORT).show();
 
-                            // Navigate to Login Activity
-                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(SignupActivity.this,
-                                    "Registration Failed: " + task.getException().getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                                            // Navigate to MainActivity2 (Dashboard)
+                                            Intent intent = new Intent(SignupActivity.this, MainActivity2.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(SignupActivity.this,
+                                                    "Failed to save user data: " + dbTask.getException().getMessage(),
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
                         }
-                    });
-        }
+                    } else {
+                        // Registration failed
+                        Toast.makeText(SignupActivity.this,
+                                "Registration Failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
