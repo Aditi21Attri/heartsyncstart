@@ -123,6 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
                     tvMaxAge.setText(maxAge + " years");
 
                     // Set gender preference
+                    // Set gender preference - convert database value to UI text
                     switch (genderPreference) {
                         case "Male":
                             rbMale.setChecked(true);
@@ -213,20 +214,35 @@ public class SettingsActivity extends AppCompatActivity {
         // Get gender preference
         int selectedGenderId = rgGenderPreference.getCheckedRadioButtonId();
         RadioButton selectedGender = findViewById(selectedGenderId);
-        genderPreference = selectedGender.getText().toString();
+        String selectedText = selectedGender.getText().toString();
+
+        // Convert UI text to database values
+        if (selectedText.equals("Men")) {
+            genderPreference = "Male";
+        } else if (selectedText.equals("Women")) {
+            genderPreference = "Female";
+        } else {
+            genderPreference = "Everyone";
+        }
 
         // Get distance from spinner
         String distanceStr = spinnerDistance.getSelectedItem().toString();
         distanceFilter = Integer.parseInt(distanceStr.replace(" km", ""));
 
-        // Save to Firebase
+        // Save to Firebase with completion listener
         settingsRef.child("minAge").setValue(minAge);
         settingsRef.child("maxAge").setValue(maxAge);
         settingsRef.child("genderPreference").setValue(genderPreference);
         settingsRef.child("distanceFilter").setValue(distanceFilter);
-        settingsRef.child("invisibleMode").setValue(invisibleMode);
-
-        Toast.makeText(this, "Settings saved successfully! ✅", Toast.LENGTH_SHORT).show();
+        settingsRef.child("invisibleMode").setValue(invisibleMode)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Settings saved successfully! ✅", Toast.LENGTH_SHORT).show();
+                    // Close activity to go back and trigger reload
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to save settings: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showChangePasswordDialog() {

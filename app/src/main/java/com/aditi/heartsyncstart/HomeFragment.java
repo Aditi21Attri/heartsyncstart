@@ -87,6 +87,19 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload users with updated filters when returning to this fragment
+        if (mAuth != null && mAuth.getCurrentUser() != null) {
+            currentUserId = mAuth.getCurrentUser().getUid();
+            currentUserIndex = 0; // Reset to first user
+            userList.clear(); // Clear old list
+            likedUserIds.clear();
+            passedUserIds.clear();
+            loadCurrentUserData(); // Reload everything with fresh settings
+        }
+    }
 
     private void loadCurrentUserData() {
         currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
