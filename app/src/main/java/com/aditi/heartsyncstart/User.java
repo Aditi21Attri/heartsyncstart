@@ -1,8 +1,14 @@
 package com.aditi.heartsyncstart;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@IgnoreExtraProperties
 public class User {
     private String userId;
     private String name;
@@ -11,12 +17,12 @@ public class User {
     private String bio;
     private String gender;
     private String imageUrl;
-    private List<String> likedUsers; // Users this user has liked
-    private List<String> matches; // Mutual matches
+    private Map<String, Boolean> likedUsers; // Changed from List to Map
+    private Map<String, Boolean> matches; // Changed from List to Map
 
     public User() {
-        this.likedUsers = new ArrayList<>();
-        this.matches = new ArrayList<>();
+        this.likedUsers = new HashMap<>();
+        this.matches = new HashMap<>();
     }
 
     public User(String userId, String name, String email, String age, String bio, String gender) {
@@ -27,8 +33,8 @@ public class User {
         this.bio = bio;
         this.gender = gender;
         this.imageUrl = "";
-        this.likedUsers = new ArrayList<>();
-        this.matches = new ArrayList<>();
+        this.likedUsers = new HashMap<>();
+        this.matches = new HashMap<>();
     }
 
     // Getters and Setters
@@ -53,9 +59,31 @@ public class User {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public List<String> getLikedUsers() { return likedUsers; }
-    public void setLikedUsers(List<String> likedUsers) { this.likedUsers = likedUsers; }
+    public Map<String, Boolean> getLikedUsers() {
+        if (likedUsers == null) likedUsers = new HashMap<>();
+        return likedUsers;
+    }
+    public void setLikedUsers(Map<String, Boolean> likedUsers) {
+        this.likedUsers = likedUsers;
+    }
 
-    public List<String> getMatches() { return matches; }
-    public void setMatches(List<String> matches) { this.matches = matches; }
+    public Map<String, Boolean> getMatches() {
+        if (matches == null) matches = new HashMap<>();
+        return matches;
+    }
+    public void setMatches(Map<String, Boolean> matches) {
+        this.matches = matches;
+    }
+
+    // Helper method to check if user is liked
+    @Exclude
+    public boolean hasLiked(String userId) {
+        return likedUsers != null && likedUsers.containsKey(userId);
+    }
+
+    // Helper method to check if matched
+    @Exclude
+    public boolean hasMatched(String userId) {
+        return matches != null && matches.containsKey(userId);
+    }
 }

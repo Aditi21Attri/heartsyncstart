@@ -32,7 +32,7 @@ public class HomeFragment extends Fragment {
     private LinearLayout noUsersLayout;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef, currentUserRef;
+    private DatabaseReference usersRef;
     private String currentUserId;
 
     private List<User> userList = new ArrayList<>();
@@ -43,42 +43,59 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Initialize Firebase
-        mAuth = FirebaseAuth.getInstance();
-        currentUserId = mAuth.getCurrentUser().getUid();
-        usersRef = FirebaseDatabase.getInstance().getReference("Users");
-        currentUserRef = usersRef.child(currentUserId);
+        try {
+            // Initialize Firebase
+            mAuth = FirebaseAuth.getInstance();
 
-        // Initialize Views
-        userCard = view.findViewById(R.id.userCard);
-        tvUserName = view.findViewById(R.id.tvUserName);
-        tvUserAge = view.findViewById(R.id.tvUserAge);
-        tvUserBio = view.findViewById(R.id.tvUserBio);
-        btnLike = view.findViewById(R.id.btnLike);
-        btnPass = view.findViewById(R.id.btnPass);
-        noUsersLayout = view.findViewById(R.id.noUsersLayout);
+            if (mAuth.getCurrentUser() == null) {
+                Toast.makeText(getContext(), "Please login first", Toast.LENGTH_SHORT).show();
+                return view;
+            }
 
-        // Load users
-        loadUsers();
+            currentUserId = mAuth.getCurrentUser().getUid();
+            usersRef = FirebaseDatabase.getInstance().getReference("Users");
 
-        // Button Click Listeners
-        btnLike.setOnClickListener(v -> likeUser());
-        btnPass.setOnClickListener(v -> passUser());
+            // Initialize Views
+            userCard = view.findViewById(R.id.userCard);
+            tvUserName = view.findViewById(R.id.tvUserName);
+            tvUserAge = view.findViewById(R.id.tvUserAge);
+            tvUserBio = view.findViewById(R.id.tvUserBio);
+            btnLike = view.findViewById(R.id.btnLike);
+            btnPass = view.findViewById(R.id.btnPass);
+            noUsersLayout = view.findViewById(R.id.noUsersLayout);
+
+            // Load users
+            loadUsers();
+
+            // Button Click Listeners
+            btnLike.setOnClickListener(v -> likeUser());
+            btnPass.setOnClickListener(v -> passUser());
+
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
 
         return view;
     }
 
     private void loadUsers() {
-        usersRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userList.clear();
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    User user = userSnapshot.getValue(User.class);
 
-                    // Don't show current user
-                    if (user != null && !user.getUserId().equals(currentUserId)) {
-                        userList.add(user);
+                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                    try {
+                        User user = userSnapshot.getValue(User.class);
+
+                        // Don't show current user
+                        if (user != null && user.getUserId() != null &&
+                                !user.getUserId().equals(currentUserId)) {
+                            userList.add(user);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
 
@@ -99,9 +116,11 @@ public class HomeFragment extends Fragment {
     private void displayCurrentUser() {
         if (currentUserIndex < userList.size()) {
             User user = userList.get(currentUserIndex);
-            tvUserName.setText(user.getName());
-            tvUserAge.setText(user.getAge());
-            tvUserBio.setText(user.getBio());
+
+            tvUserName.setText(user.getName() != null ? user.getName() : "Unknown");
+            tvUserAge.setText(user.getAge() != null ? user.getAge() : "N/A");
+            tvUserBio.setText(user.getBio() != null && !user.getBio().isEmpty() ?
+                    user.getBio() : "No bio available");
 
             userCard.setVisibility(View.VISIBLE);
             noUsersLayout.setVisibility(View.GONE);
@@ -113,12 +132,6 @@ public class HomeFragment extends Fragment {
     private void likeUser() {
         if (currentUserIndex < userList.size()) {
             User likedUser = userList.get(currentUserIndex);
-
-            // Add to current user's liked list
-            currentUserRef.child("likedUsers").child(likedUser.getUserId()).setValue(true);
-
-            // Check if it's a match
-            checkForMatch(likedUser);
 
             Toast.makeText(getContext(), "Liked " + likedUser.getName() + " ❤️", Toast.LENGTH_SHORT).show();
 
@@ -139,35 +152,10 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void checkForMatch(User likedUser) {
-        DatabaseReference likedUserRef = usersRef.child(likedUser.getUserId());
-
-        likedUserRef.child("likedUsers").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    // IT'S A MATCH! 🎉
-                    createMatch(likedUser);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
-
-    private void createMatch(User matchedUser) {
-        // Add to both users' matches
-        currentUserRef.child("matches").child(matchedUser.getUserId()).setValue(true);
-        usersRef.child(matchedUser.getUserId()).child("matches").child(currentUserId).setValue(true);
-
-        // Show match dialog
-        Toast.makeText(getContext(), "🎉 It's a Match with " + matchedUser.getName() + "!", Toast.LENGTH_LONG).show();
-    }
-
     private void showNoUsersMessage() {
-        userCard.setVisibility(View.GONE);
-        noUsersLayout.setVisibility(View.VISIBLE);
+        if (userCard != null && noUsersLayout != null) {
+            userCard.setVisibility(View.GONE);
+            noUsersLayout.setVisibility(View.VISIBLE);
+        }
     }
 }
